@@ -1,0 +1,63 @@
+create table book
+	(ID			varchar(6),
+	 title			varchar(50) not null,
+	 author			varchar(20),
+	 genre			varchar(20), 
+	 price			numeric(6,2) check (price >= 0), 
+	 copies			numeric(4,0) check (copies >= 0),
+	 primary key (ID)
+	);
+
+create table member
+	(member_id		varchar(5),
+	 name			varchar(20),
+	 email			varchar(40),
+	 primary key (member_id)
+	);
+
+create table bought
+	(member_id		varchar(5), 
+	 ID			varchar(6),
+	 date			varchar(10), 
+	 primary key (ID, member_id),
+	 foreign key (member_id) references member (member_id)
+		on delete cascade,
+	 foreign key (ID) references book (ID)
+		on delete cascade
+	);
+
+
+insert into book values('111111', 'Little Women', 'Louisa May Alcott', 'Coming-of-Age', 12.00, 10);
+
+insert into book values('111112', 'Anne of Green Gables', 'L. M. Montgomery', 'Coming-of-Age', 12.00, 15);
+
+insert into book values('111113', 'Mistborn', 'Brandon Sanderson', 'Fantasy', 14.99, 8);
+
+insert into book values('111114', 'Klara and the Sun', 'Kazuo Ishiguro', 'Literary Fiction', 25.75, 5);
+
+insert into book values('111115', 'A Man Called Ove', 'Fredrik Backman', 'Literary Fiction', 18.99, 6);
+
+insert into book values('111116', 'Nightshade Academy', 'Mel Torrefranca', 'Fantasy', 25.99, 4);
+
+insert into book values('111117', 'Cinder', 'Marissa Meyer', 'Fantasy', 21.00, 9);
+
+insert into book values('111118', 'The Hunger Games', 'Suzanne Collins', 'Dystopian', 18.39, 8);
+
+insert into member values('12345', 'Jane Doe', 'jane.doe@gmail.com');
+
+insert into member values('23456', 'John Doe', 'johndoe@gmail.com');
+
+insert into bought values('12345', '111111', '03/11/2026');
+
+insert into bought values('12345', '111112', '03/11/2026');
+
+insert into bought values('23456', '111113', '04/12/2026');
+
+
+foreign key?
+not null?
+types?
+
+
+
+
