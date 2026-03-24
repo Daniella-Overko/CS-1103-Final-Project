@@ -18,11 +18,6 @@ public class Bookstore
 			// Connect to a database
 			conn = DriverManager.getConnection("jdbc:sqlite:Bookstore.db");
 
-			// To check the number of rows added to each table later on
-			int bookRows = 0;
-			int memberRows = 0;
-			int boughtRows = 0;
-
 			// Arrays with the attributes to create an instance of the Book table
 			String[] ids = {"111111", "111112", "111113", "111114", "111115", "111116", "111117", "111118"};
 			String[] titles = {"Little Women", "Anne of Green Gables", "Mistborn", "Klara and the Sun", "A Man Called Ove", "Nightshade Academy", "Cinder", "The Hunger Games"};
@@ -40,38 +35,40 @@ public class Bookstore
 			String[] bMemberIds = {"12345", "12345", "23456", "23456"};
 			String[] bIds = {"111111", "111112", "111113", "111111"};
 			String[] dates = {"03/11/2026", "03/11/2026", "04/12/2026", "05/01/2026"};
+			
+//-----------------------------CREATE Statements--------------------------------
 
 			// Create a statement
 			Statement stmt = conn.createStatement();
 			
 			// Design the database schema
-			String sql = "create table if not exists book "
-				+ "(ID			varchar(6), "
-				+ " title			varchar(50) not null, "
+			String sql = "CREATE TABLE IF NOT EXISTS book "
+				+ "(ID				varchar(6), "
+				+ " title			varchar(50) NOT NULL, "
 				+ " author			varchar(20), "
 				+ " genre			varchar(20), "
-				+ " price			numeric(3,2) check (price >= 0), "
-				+ " copies			numeric(4,0) check (copies >= 0), "
-				+ " primary key (ID)"
+				+ " price			numeric(3,2) CHECK (price >= 0), "
+				+ " copies			numeric(4,0) CHECK (copies >= 0), "
+				+ " PRIMARY KEY (ID)"
 				+ ")";
 			
-			String sql1 = "create table if not exists member "
+			String sql1 = "CREATE TABLE IF NOT EXISTS member "
 				+ "(member_id		varchar(5), "
 				+ " name			varchar(20), "
 				+ " email			varchar(40), "
-				+ " primary key (member_id)"
+				+ " PRIMARY KEY (member_id)"
 				+ ")";
 				
-			String sql2 = "create table if not exists bought "
+			String sql2 = "CREATE TABLE IF NOT EXISTS bought "
 				+ "(member_id		varchar(5), "
 				+ " ID				varchar(6), "
 				+ " date			varchar(10), "
-				+ " primary key (ID, member_id), "
-				+ " foreign key (member_id)	references member (member_id) on delete cascade, "
-				+ " foreign key (ID) references book (ID) on delete cascade"
+				+ " PRIMARY KEY (ID, member_id), "
+				+ " FOREIGN KEY (member_id)	REFERENCES member (member_id) ON DELETE CASCADE, "
+				+ " FOREIGN KEY (ID) REFERENCES book (ID) ON DELETE CASCADE"
 				+ ")";
 				
-			// Execute three CREATE queries
+			// Execute three CREATE statements
 			stmt.executeUpdate(sql);
 			System.out.println("Table 'Book' created successfully. ");
 			
@@ -81,11 +78,16 @@ public class Bookstore
 			stmt.executeUpdate(sql2);
 			System.out.println("Table 'Bought' created successfully. ");
 
+//-----------------------------INSERT Statements--------------------------------
 
 			// Insert rows into Book table
-			String sql3 = "insert or replace into book (ID, title, author, genre, price, copies) values(?, ?, ?, ?, ?, ?)";
+			// Create a statement
+			String sql3 = "INSERT OR REPLACE INTO book (ID, title, author, genre, price, copies) VALUES(?, ?, ?, ?, ?, ?)";
 			
 			PreparedStatement pstmt = conn.prepareStatement(sql3);
+			
+			// Keep track of added rows to check
+			int bookRows = 0;
 				
 			// Set parameters
 			for (int i = 0; i < 8; i++)
@@ -97,7 +99,7 @@ public class Bookstore
 				pstmt.setDouble(5, prices[i]);
 				pstmt.setInt(6, copies[i]);
 				
-				// Execute the INSERT queries
+				// Execute the INSERT statements
 				bookRows += pstmt.executeUpdate();
 			}
 			// Check
@@ -105,9 +107,13 @@ public class Bookstore
 			
 			
 			// Insert rows into Member table
-			String sql4 = "insert or replace into Member (member_id, name, email) values(?, ?, ?)";
+			// Create a statement
+			String sql4 = "INSERT OR REPLACE INTO Member (member_id, name, email) VALUES(?, ?, ?)";
 			
 			PreparedStatement pstmt2 = conn.prepareStatement(sql4);
+			
+			// Keep track of added rows to check
+			int memberRows = 0;
 				
 			// Set parameters
 			for (int i = 0; i < 2; i++)
@@ -116,7 +122,7 @@ public class Bookstore
 				pstmt2.setString(2, names[i]);
 				pstmt2.setString(3, emails[i]);
 				
-				// Execute the INSERT queries
+				// Execute the INSERT statements
 				memberRows += pstmt2.executeUpdate();
 			}
 			// Check
@@ -124,9 +130,13 @@ public class Bookstore
 			
 			
 			// Insert rows into Bought table
-			String sql5 = "insert or replace into bought (member_id, ID, date) values(?, ?, ?)";
+			// Create a statement
+			String sql5 = "INSERT OR REPLACE INTO bought (member_id, ID, date) VALUES(?, ?, ?)";
 			
 			PreparedStatement pstmt3 = conn.prepareStatement(sql5);
+			
+			// Keep track of added rows to check
+			int boughtRows = 0;
 				
 			// Set parameters
 			for (int i = 0; i < 4; i++)
@@ -135,16 +145,18 @@ public class Bookstore
 				pstmt3.setString(2, bIds[i]);
 				pstmt3.setString(3, dates[i]);
 				
-				// Execute the INSERT queries
+				// Execute the INSERT statements
 				boughtRows += pstmt3.executeUpdate();
 			}
 			// Check
 			System.out.println(boughtRows + " row(s) inserted into Bought table. ");
-				
+			
+//-----------------------------SELECT Statements--------------------------------			
 			
 			// Execute a SELECT query
-			ResultSet rs = stmt.executeQuery("select * from book");
+			ResultSet rs = stmt.executeQuery("SELECT * FROM book");
 			
+			// Keep track of whether the table has rows to avoid errors
 			boolean bookHasRows = false;
 			
 			// Loop through the result set and print the results
@@ -161,6 +173,7 @@ public class Bookstore
 				);
 			}
 			
+			// Let user know if there is nothing to select
 			if (!bookHasRows)
 			{
 				System.out.println("No rows found in book table.");
@@ -168,8 +181,9 @@ public class Bookstore
 			
 			
 			// Execute a SELECT query
-			ResultSet rs1 = stmt.executeQuery("select * from member");
+			ResultSet rs1 = stmt.executeQuery("SELECT * FROM member");
 			
+			// Keep track of whether the table has rows to avoid errors
 			boolean memberHasRows = false;
 			
 			// Loop through the result set and print the results
@@ -183,6 +197,7 @@ public class Bookstore
 				);
 			}
 			
+			// Let user know if there is nothing to select
 			if (!memberHasRows)
 			{
 				System.out.println("No rows found in member table.");
@@ -190,8 +205,9 @@ public class Bookstore
 			
 			
 			// Execute a SELECT query
-			ResultSet rs2 = stmt.executeQuery("select * from bought");
+			ResultSet rs2 = stmt.executeQuery("SELECT * FROM bought");
 			
+			//Keep track of whether the table has rows to avoid errors
 			boolean boughtHasRows = false;
 			
 			// Loop through the result set and print the results
@@ -205,14 +221,16 @@ public class Bookstore
 				);
 			}
 			
+			// Let user know if there is nothing to select
 			if (!boughtHasRows)
 			{
 				System.out.println("No rows found in bought table.");
 			}
 			
+//-----------------------------UPDATE Statements--------------------------------
 			
 			// Update statement
-			String sql6 = "update book set copies = copies - (select count(*) from bought where bought.ID = book.id) where ID in (select id from bought)";
+			String sql6 = "UPDATE book SET copies = copies - (SELECT COUNT(*) FROM bought WHERE bought.ID = book.ID) WHERE ID IN (SELECT id FROM bought)";
 			
 			//int newCopies = 9;
 			//String idToUpdate = "111111";
@@ -226,10 +244,8 @@ public class Bookstore
 			System.out.println(rowsAffected + " row(s) updated. ");
 			
 			
-			// Execute a SELECT query
-			ResultSet rs3 = stmt.executeQuery("select * from book");
-			
-			//boolean bookHasRows = false;
+			// Execute a SELECT query again to check the UPDATE statement execution
+			ResultSet rs3 = stmt.executeQuery("SELECT * FROM book");
 			
 			// Loop through the result set and print the results
 			while (rs3.next()) 
@@ -245,13 +261,15 @@ public class Bookstore
 				);
 			}
 			
+			// Let user know if there is nothing to select
 			if (!bookHasRows)
 			{
 				System.out.println("No rows found in book table.");
 			}
 			
+//-----------------------------DELETE Statements--------------------------------
 			
-			String sql7 = "delete from bought where member_id = ? and ID = ?";
+			String sql7 = "DELETE FROM bought WHERE member_id = ? AND ID = ?";
 			
 			pstmt = conn.prepareStatement(sql7);
 			
@@ -262,10 +280,8 @@ public class Bookstore
 			System.out.println(rowsAffected + " row(s) deleted. ");
 			
 			
-			// Execute a SELECT query
-			ResultSet rs4 = stmt.executeQuery("select * from bought");
-			
-			//boolean boughtHasRows = false;
+			// Execute a SELECT query again to check the DELETE statement execution
+			ResultSet rs4 = stmt.executeQuery("SELECT * FROM bought");
 			
 			// Loop through the result set and print the results
 			while (rs4.next()) 
@@ -278,12 +294,14 @@ public class Bookstore
 				);
 			}
 			
+			// Let user know if there is nothing to select
 			if (!boughtHasRows)
 			{
 				System.out.println("No rows found in bought table.");
 			}
 			
 		} 
+		// Catch Exceptions
 		catch (SQLException | ClassNotFoundException e) 
 		{
 			e.printStackTrace();
